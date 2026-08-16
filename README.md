@@ -13,6 +13,15 @@ hand.** He builds and operates the machine that does.
 Before this: a career in reliability engineering on Fortune 500 payment systems at PayPal and
 Fiserv. That is where the instinct for staged rollouts and blast-radius containment comes from.
 
+**Part of that machine is public, and you can read it.** In a public marketplace repository he built
+the scheduled job that re-pins every catalog entry to its upstream's current commit, and the recovery
+job that reverts only the entries failing validation, so one broken upstream cannot hold back the
+rest. A crashed validation run and a clean pass both produce zero failures, so the run emits a
+separate did-this-run signal and the job holding write access treats a crash as do-nothing, never as
+all-clear — the whole design is in the diff:
+
+**[Automated SHA-freshness: in-repo bump + validate-gated auto-revert](https://github.com/anthropics/claude-plugins-community/pull/70)**
+
 ---
 
 ## Accounts, and previous handles
@@ -43,9 +52,10 @@ complete entry point — you do not need to visit both.
 
 ## What he builds
 
-Most of this runs in private infrastructure, so what follows is capability rather than a tour — no
-repository names, no findings, nothing about what any of it was pointed at. The public record in
-the next section is what corroborates it.
+The audit and review side runs in private infrastructure, so what follows about it is capability
+rather than a tour — no findings, nothing about what any of it was pointed at. **The automation
+around it is a different matter: a good deal of it is public, in repositories anyone can read signed
+out**, and the diffs are linked below rather than described.
 
 **Build, audit, and publish pipelines.** Schema and manifest validation at intake, with URL defenses
 that run before anything is fetched, so a hostile or malformed remote never reaches a network call.
@@ -115,6 +125,14 @@ third-party MCP repositories.
 ---
 
 ## The public record
+
+**Four public diffs, each a different failure mode.** Read the code rather than the counts; the
+counts are underneath.
+
+- **[A CI install that reported success and left no usable binary](https://github.com/anthropics/claude-plugins-community/pull/233)** — the package fetches its runtime in a postinstall, and a reinstall npm treats as already satisfied skips it. The fix forces the platform-native dependency, checks the binary actually landed, clears the package directory between attempts so a retry is a real reinstall, and bounds every network step so a stalled fetch fails fast. Extends a shared action he did not create.
+- **[The external-contribution scope guard he wrote, widened to exempt the repository's own automation](https://github.com/anthropics/claude-plugins-official/pull/3402)** — with the argument for why a fork cannot impersonate that author written into the file, and a permission lookup that used to throw for non-collaborators — the exact population the guard exists to evaluate — now falling through to the scope check instead of erroring the job.
+- **[A bump that would have re-pinned a plugin whose content directory had vanished upstream](https://github.com/anthropics/claude-plugins-community/pull/267)** — skipped rather than pinned against a fabricated placeholder manifest, with the tests confirmed by disabling the fix and checking that they fail. Extends a shared action he did not create; the test harnesses are his.
+- **[An injection path in a repository he does not own](https://github.com/modelcontextprotocol/mcpb/pull/230)** — a reference example declares `tab_id` a number, but that server's request path did not enforce it, and the value was interpolated into an AppleScript template where a quote character could close the literal and append arbitrary script. No one had reported it. Someone else reviewed and merged the fix.
 
 What a stranger can verify without any access. Every figure below is a **floor**, not an estimate —
 these counts only grow, so a floor stays true while an approximation is wrong the moment the number
