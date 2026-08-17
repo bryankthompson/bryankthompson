@@ -237,10 +237,19 @@ that earn a line here:
 
 | Project | What it is |
 |---|---|
+| [viewer-parity](https://github.com/bryan-anthropic/viewer-parity) | A GitHub Action that checks published figures and links from the reader's seat. GitHub search returns what the *caller* can see, so `is:pr is:merged author:you` silently counts pull requests in private repositories you have access to — publish that and it is larger than the number a stranger gets from the link beside it. The publisher is structurally the last to find out, because the publisher is always signed in. It re-derives each claim unauthenticated, fails when a figure falls below its published floor, fails when a query's answer could depend on who is asking, fails when the link beside a figure does not resolve signed out, and fails when a pull request lowers a floor. Zero dependencies, no build step. It is the pattern behind [triepod.ai/record](https://triepod.ai/record), extracted so it runs on anyone's repository. |
 | [inspector-assessment](https://github.com/bryankthompson/inspector-assessment) | An expanded build of the [MCP Inspector](https://github.com/modelcontextprotocol/inspector) that adds an automated assessment pass over a server: it exercises every declared tool, checks the declarations against observed behaviour, and reports what it found rather than only giving you a console to poke at. **Archived — it was the research phase, and the experiment returned a negative result.** Still published to npm as `@bryan-thompson/inspector-assessment` and still runnable against your own server. [What it found, and why it stopped](https://triepod.ai/inspector-assessment). |
 | [mcp-dashboard](https://github.com/bryankthompson/mcp-dashboard) | A management and monitoring interface for running several MCP servers at once: connection state, tool inventories, and request inspection across servers in one view. Built on the same Inspector foundation. |
 | [memory-system-mcp](https://github.com/bryankthompson/memory-system-mcp) | A knowledge-graph memory server — entities, relations and observations that persist across sessions instead of living only in a context window. Derived from the upstream memory MCP server. |
 | [mcp_vulnerable_testbed](https://github.com/bryankthompson/mcp_vulnerable_testbed) | A deliberately vulnerable MCP server, built as a target for security testing. |
+
+Run the same check over your own published numbers, in a workflow:
+
+```yaml
+- uses: bryan-anthropic/viewer-parity@v1
+  with:
+    claims: .github/published-claims.json
+```
 
 Run the assessment tool against your own server without installing it:
 
